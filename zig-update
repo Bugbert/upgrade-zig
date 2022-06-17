@@ -1,0 +1,46 @@
+#!/bin/python3
+
+import json
+import requests
+import hashlib
+import os
+
+ZIG_JSON_URL = "https://ziglang.org/download/index.json"
+
+def find_checksum(FILE_NAME):
+    h = hashlib.sha256()
+
+   # open file for reading in binary mode
+    with open(FILE_NAME,'rb') as file:
+
+        # loop till the end of the file
+        chunk = 0
+        while chunk != b'':
+           # read only 1024 bytes at a time
+           chunk = file.read(1024)
+           h.update(chunk)
+
+    # return the hex representation of digest
+    return h.hexdigest()
+
+ZIG_JSON_FILE = requests.get(ZIG_JSON_URL).content
+PY_JSON = json.loads(ZIG_JSON_FILE)
+
+MASTER = PY_JSON["master"]
+DOWNLOAD_CONTENT = MASTER["x86_64-linux"]
+DOWNLOAD_URL = DOWNLOAD_CONTENT["tarball"]
+DOWNLOAD_CHECKSUM = DOWNLOAD_CONTENT["shasum"]
+
+DOWNLOAD_COMMAND = 'wget '+DOWNLOAD_URL+' -O ~/Downloads/zig.tar.xz'
+os.system(DOWNLOAD_COMMAND)
+
+FILE_NAME = "/home/avery/Downloads/zig.tar.xz"
+
+BIN_SHASUM = find_checksum(FILE_NAME)
+print(BIN_SHASUM)
+
+if BIN_SHASUM == DOWNLOAD_CHECKSUM:
+    print("Checksum sucseeded")
+else:
+    print("Checksum failed")
+

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+current_dir=$(pwd)
+
+cd ~/.local/share
+
+rm -r zig
+tar -xf ~/Downloads/zig.tar.xz
+mv zig* zig
+
+rm -r ~/Downloads/zig.tar.xz
+
+cd $current_dir
